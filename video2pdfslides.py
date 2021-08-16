@@ -98,7 +98,7 @@ def detect_unique_screenshots(video_path, output_folder_screenshot_path):
     start_time = time.time()
     (W, H) = (None, None)
 
-    screenshoots_count = 0
+    screenshots_count = 0
     for frame_count, frame_time, frame in get_frames(video_path):
         orig = frame.copy() # clone the original frame (so we can save it later),
         frame = imutils.resize(frame, width=600) # resize the frame
@@ -119,20 +119,20 @@ def detect_unique_screenshots(video_path, output_folder_screenshot_path):
 
         if p_diff < MIN_PERCENT and not captured and frame_count > WARMUP:
             captured = True
-            filename = f"{screenshoots_count:03}_{round(frame_time/60, 2)}.png"
+            filename = f"{screenshots_count:03}_{round(frame_time/60, 2)}.png"
 
             path = os.path.join(output_folder_screenshot_path, filename)
-            print("saving {}".format(path))
+            print(f"Saving {path}")
             cv2.imwrite(path, orig)
-            screenshoots_count += 1
+            screenshots_count += 1
 
         # otherwise, either the scene is changing or we're still in warmup
         # mode so let's wait until the scene has settled or we're finished
         # building the background model
         elif captured and p_diff >= MAX_PERCENT:
             captured = False
-    print(f'{screenshoots_count} screenshots Captured!')
-    print(f'Time taken {time.time()-start_time}s')
+    print(f'{screenshots_count} screenshots Captured!')
+    print(f'Time taken {time.time() - start_time}s')
 
 
 def initialize_output_folder(video_path):
@@ -174,18 +174,7 @@ def main():
         print('video_path', video_path)
         output_folder_screenshot_path = initialize_output_folder(video_path)
         detect_unique_screenshots(video_path, output_folder_screenshot_path)
-
-        print('Please Manually verify screenshots and delete duplicates')
-        while True:
-            choice = input("Press y to continue and n to terminate")
-            choice = choice.lower().strip()
-            if choice in ['y', 'n']:
-                break
-            else:
-                print('please enter a valid choice')
-
-        if choice == 'y':
-            convert_screenshots_to_pdf(output_folder_screenshot_path, video_path)
+        convert_screenshots_to_pdf(output_folder_screenshot_path, video_path)
 
 
 if __name__ == "__main__":
