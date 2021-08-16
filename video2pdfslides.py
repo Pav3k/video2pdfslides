@@ -38,7 +38,8 @@ def define_files():
 
 
 def extract_filename(path_to_file):
-    return os.path.basename(path_to_file).split(".")[0]
+    """Return filename without extension from full path."""
+    return os.path.splitext(os.path.basename(path_to_file))[0]
 
 
 def get_frames(video_path):
