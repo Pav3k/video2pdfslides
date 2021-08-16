@@ -15,7 +15,8 @@ PATH_TO_OUTPUT_DIR = os.path.abspath(os.path.join(".", OUTPUT_DIR))
 FRAME_RATE = 3                   # no.of frames per second that needs to be processed, fewer the count faster the speed
 WARMUP = FRAME_RATE              # initial number of frames to be skipped
 FGBG_HISTORY = FRAME_RATE * 15   # no.of frames in background object
-VAR_THRESHOLD = 16               # Threshold on the squared Mahalanobis distance between the pixel and the model to decide whether a pixel is well described by the background model.
+VAR_THRESHOLD = 16               # Threshold on the squared Mahalanobis distance between the pixel and the model to decide
+                                 # whether a pixel is well described by the background model.
 DETECT_SHADOWS = False            # If true, the algorithm will detect shadows and mark them.
 MIN_PERCENT = 0.1                # min % of diff between foreground and background to detect if motion has stopped
 MAX_PERCENT = 3                  # max % of diff between foreground and background to detect if frame is still in motion
@@ -41,10 +42,14 @@ def extract_filename(path_to_file):
 
 
 def get_frames(video_path):
-    '''A fucntion to return the frames from a video located at video_path
-    this function skips frames as defined in FRAME_RATE'''
+    """
+    Return frames from a video located at *video_path*.
 
+    This function skips frames as defined in FRAME_RATE.
 
+    :return:
+        Generator of 3 vars.
+    """
     # open a pointer to the video file initialize the width and height of the frame
     vs = cv2.VideoCapture(video_path)
     if not vs.isOpened():
@@ -71,19 +76,22 @@ def get_frames(video_path):
         frame_count += 1
         yield frame_count, frame_time, frame
 
-    vs.release()
-
-
 
 def detect_unique_screenshots(video_path, output_folder_screenshot_path):
-    ''''''
-    # Initialize fgbg a Background object with Parameters
+    """
+    Initialize fgbg a Background object with Parameters.
+
+    :return:
+        None.
+    """
     # history = The number of frames history that effects the background subtractor
-    # varThreshold = Threshold on the squared Mahalanobis distance between the pixel and the model to decide whether a pixel is well described by the background model. This parameter does not affect the background update.
-    # detectShadows = If true, the algorithm will detect shadows and mark them. It decreases the speed a bit, so if you do not need this feature, set the parameter to false.
+    # varThreshold = Threshold on the squared Mahalanobis distance between the pixel
+    # and the model to decide whether a pixel is well described by the background model.
+    # This parameter does not affect the background update.
+    # detectShadows = If true, the algorithm will detect shadows and mark them.
+    # It decreases the speed a bit, so if you do not need this feature, set the parameter to false.
 
     fgbg = cv2.createBackgroundSubtractorMOG2(history=FGBG_HISTORY, varThreshold=VAR_THRESHOLD,detectShadows=DETECT_SHADOWS)
-
 
     captured = False
     start_time = time.time()
@@ -96,8 +104,8 @@ def detect_unique_screenshots(video_path, output_folder_screenshot_path):
         mask = fgbg.apply(frame) # apply the background subtractor
 
         # apply a series of erosions and dilations to eliminate noise
-#            eroded_mask = cv2.erode(mask, None, iterations=2)
-#            mask = cv2.dilate(mask, None, iterations=2)
+        # eroded_mask = cv2.erode(mask, None, iterations=2)
+        # mask = cv2.dilate(mask, None, iterations=2)
 
         # if the width and height are empty, grab the spatial dimensions
         if W is None or H is None:
@@ -124,11 +132,15 @@ def detect_unique_screenshots(video_path, output_folder_screenshot_path):
             captured = False
     print(f'{screenshoots_count} screenshots Captured!')
     print(f'Time taken {time.time()-start_time}s')
-    return
 
 
 def initialize_output_folder(video_path):
-    """Clean the output folder if already exists."""
+    """
+    Clean the output folder if already exists.
+
+    :return:
+        String path to newly created DIR located in *OUTPUT_DIR*.
+    """
     file_name = extract_filename(video_path)
     output_folder_screenshot_path = os.path.join(PATH_TO_OUTPUT_DIR, file_name)
 
@@ -141,6 +153,10 @@ def initialize_output_folder(video_path):
 
 
 def convert_screenshots_to_pdf(output_folder_screenshot_path, video_path):
+    """
+    :return:
+        None.
+    """
     file_name = extract_filename(video_path)
     output_pdf_path = os.path.join(OUTPUT_DIR, f"{file_name}.pdf")
 
