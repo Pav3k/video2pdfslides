@@ -162,9 +162,13 @@ def convert_screenshots_to_pdf(output_folder_screenshot_path, video_path):
     output_pdf_path = os.path.join(OUTPUT_DIR, f"{file_name}.pdf")
 
     with open(output_pdf_path, "wb") as f:
-        f.write(img2pdf.convert(sorted(glob.glob(f"{output_folder_screenshot_path}/*.png"))))
-    print('Pdf Created!')
-    print('pdf saved at', output_pdf_path)
+        try:
+            f.write(img2pdf.convert(sorted(glob.glob(f"{output_folder_screenshot_path}/*.png"))))
+            print('Pdf Created!')
+            print('pdf saved at', output_pdf_path)
+        except ValueError:
+            print(f"[ERROR] Cannot process '{file_name}'")
+
 
 
 def main():
